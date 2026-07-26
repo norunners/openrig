@@ -1,2 +1,46 @@
-# openrig
-The agentless coding harness.
+# OpenRig
+
+OpenRig is an agentless coding harness exposed through MCP.
+
+## Agent Workflow
+
+Call `help` when the lifecycle is unfamiliar. Routine work starts directly with
+`turn op=begin`; use `status` only to recover context or diagnose runtime state.
+
+Common flow:
+
+1. `turn op=begin` with `repo` and a concise `goal`. OpenRig creates the
+   isolated worktree.
+2. Call work tools with the returned `turn_id`.
+3. Call `diff` with that `turn_id`.
+4. `turn op=end` with an `outcome` and concise summary.
+
+Use `status`, explicit `worktree` management, advanced diff ranges, and process
+supervision only when the task requires them. Use freestyle mode as an explicit
+escape hatch when isolated worktree execution is not appropriate.
+
+Native tools:
+
+- `help`: lifecycle and contract guidance.
+- `status`: compact current-session readiness and recovery summary.
+- `worktree`: isolated Git worktree lifecycle.
+- `turn`: scoped agent-work lifecycle.
+- `diff`: bounded turn, worktree, Git, and revision diffs.
+- `shell`: bounded one-shot shell execution.
+- `apply_patch`: structured file edits.
+- `process`: supervised long-running processes.
+- `skill_activate`: conditional on local skill availability.
+
+Public naming is intentional:
+
+- `repo` selects a configured repository name, alias, or allowed path.
+- `base` is the existing Git ref used to create a worktree.
+- `branch` is an optional new branch created for that worktree.
+- `workdir` is an optional path relative to the scoped workspace root.
+- `cwd` appears only in responses that report a resolved absolute directory.
+
+Shell, process, diff, and skill output bounds are runtime policy rather than
+agent-selected tuning knobs. Worktree, turn, and process list operations return
+runtime-bounded snapshots of recent matching resources in deterministic order.
+Exact bounds and sort keys are runtime policy rather than agent-selected knobs
+or wire-compatibility promises.
