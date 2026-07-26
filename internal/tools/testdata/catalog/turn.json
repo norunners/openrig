@@ -1,0 +1,419 @@
+{
+  "tools": [
+    {
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Explain OpenRig's common, advanced, recovery, and freestyle workflows.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "Optional guidance topic.",
+            "enum": [
+              "common",
+              "advanced",
+              "freestyle",
+              "worktree",
+              "turn",
+              "diff",
+              "status",
+              "ids",
+              "errors",
+              "schemas"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "help"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Inspect current-session readiness, active work, and health when recovering or diagnosing OpenRig.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "name": "status"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "description": "Manage isolated Git worktrees. List returns a runtime-bounded snapshot of recent matches in deterministic order.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "description": "Optional Git base for open. Omitted means HEAD.",
+            "type": "string"
+          },
+          "branch": {
+            "description": "Optional new branch name for open. Omit to create a detached worktree.",
+            "type": "string"
+          },
+          "op": {
+            "description": "Operation to perform.",
+            "enum": [
+              "open",
+              "list",
+              "status",
+              "close",
+              "delete"
+            ],
+            "type": "string"
+          },
+          "reason": {
+            "description": "Optional concise audit reason recorded with open.",
+            "type": "string"
+          },
+          "repo": {
+            "description": "Repository selector for open or list: configured name, alias, or allowed path.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Optional list filter.",
+            "enum": [
+              "open",
+              "closed",
+              "deleted",
+              "any"
+            ],
+            "type": "string"
+          },
+          "worktree_id": {
+            "description": "Worktree ID required by status, close, and delete.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op"
+        ],
+        "type": "object"
+      },
+      "name": "worktree"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "description": "Begin, inspect, or end scoped work. Status returns a runtime-bounded snapshot of recent matches in deterministic order.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "goal": {
+            "description": "Concise goal required by begin.",
+            "type": "string"
+          },
+          "mode": {
+            "description": "Optional begin or status mode. Begin defaults to an isolated worktree; use freestyle only as an escape hatch.",
+            "enum": [
+              "worktree",
+              "freestyle"
+            ],
+            "type": "string"
+          },
+          "op": {
+            "description": "Operation to perform.",
+            "enum": [
+              "status",
+              "begin",
+              "end"
+            ],
+            "type": "string"
+          },
+          "outcome": {
+            "description": "Required terminal outcome for end.",
+            "enum": [
+              "completed",
+              "blocked",
+              "abandoned",
+              "design_only",
+              "verification_only"
+            ],
+            "type": "string"
+          },
+          "repo": {
+            "description": "Repository selector for begin or status. Worktree-mode begin creates an isolated worktree automatically.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Optional status filter.",
+            "enum": [
+              "active",
+              "ended",
+              "any"
+            ],
+            "type": "string"
+          },
+          "summary": {
+            "description": "Optional concise summary recorded with end.",
+            "type": "string"
+          },
+          "turn_id": {
+            "description": "Turn ID required by end or used as an exact status selector.",
+            "type": "string"
+          },
+          "worktree_id": {
+            "description": "Optional existing worktree to reuse for begin, or a status filter. Mutually exclusive with repo for begin.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "op"
+        ],
+        "type": "object"
+      },
+      "name": "turn"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Render a bounded diff. Supplying only turn_id compares the turn's start with its current or persisted end state.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "description": "Starting Git ref or revision ID when required by the selected kind.",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Optional advanced diff kind. Omit for the common turn_id operation.",
+            "enum": [
+              "worktree",
+              "git",
+              "revision"
+            ],
+            "type": "string"
+          },
+          "paths": {
+            "description": "Optional repository-relative path filters.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "stat": {
+            "default": false,
+            "description": "Return summary statistics instead of a unified patch.",
+            "type": "boolean"
+          },
+          "to": {
+            "description": "Ending Git ref or revision ID when required by the selected kind.",
+            "type": "string"
+          },
+          "turn_id": {
+            "description": "Turn to diff from its starting revision to current or persisted end state, or a scope for an advanced Git diff.",
+            "type": "string"
+          },
+          "worktree_id": {
+            "description": "Worktree selector for worktree or Git diffs.",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "diff"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "description": "Run one bounded shell command in the scoped repository.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "description": "Shell script to run in the configured shell.",
+            "type": "string"
+          },
+          "turn_id": {
+            "description": "Active turn ID that scopes this operation.",
+            "type": "string"
+          },
+          "workdir": {
+            "description": "Optional working directory relative to the scoped workspace root. Defaults to that root.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "turn_id",
+          "command"
+        ],
+        "type": "object"
+      },
+      "name": "shell"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "description": "Apply a structured patch in the scoped repository.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "patch": {
+            "description": "Complete patch text in the supported patch grammar.",
+            "type": "string"
+          },
+          "turn_id": {
+            "description": "Active turn ID that scopes this operation.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "turn_id",
+          "patch"
+        ],
+        "type": "object"
+      },
+      "name": "apply_patch"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "description": "Manage supervised processes. Status returns a runtime-bounded snapshot of recent matches in deterministic order.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "description": "Shell command required by start.",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "Optional read cursor returned by a previous read.",
+            "type": "string"
+          },
+          "env": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Optional environment variables for start.",
+            "properties": {},
+            "type": "object"
+          },
+          "op": {
+            "description": "Operation to perform.",
+            "enum": [
+              "start",
+              "status",
+              "read",
+              "stop",
+              "restart",
+              "kill"
+            ],
+            "type": "string"
+          },
+          "process_id": {
+            "description": "Process ID required by read, stop, restart, and kill or used as an exact status selector.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Optional status filter.",
+            "enum": [
+              "running",
+              "exited",
+              "stopped",
+              "killed",
+              "restarting",
+              "any"
+            ],
+            "type": "string"
+          },
+          "turn_id": {
+            "description": "Active turn ID that scopes this operation.",
+            "type": "string"
+          },
+          "workdir": {
+            "description": "Optional start working directory relative to the scoped workspace root. Defaults to that root.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "turn_id",
+          "op"
+        ],
+        "type": "object"
+      },
+      "name": "process"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Load instructions for one local agent skill. Scripts and references are returned as text and never executed.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "include_references": {
+            "default": false,
+            "description": "Include bounded reference file contents.",
+            "type": "boolean"
+          },
+          "include_scripts": {
+            "default": false,
+            "description": "Include bounded script file contents.",
+            "type": "boolean"
+          },
+          "skill": {
+            "description": "Skill directory name.",
+            "maxLength": 64,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
+          "turn_id": {
+            "description": "Active turn ID that scopes this operation.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "turn_id",
+          "skill"
+        ],
+        "type": "object"
+      },
+      "name": "skill_activate"
+    }
+  ]
+}

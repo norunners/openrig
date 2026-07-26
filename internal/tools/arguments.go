@@ -382,7 +382,7 @@ func decodeArguments(toolName string, scope Scope, arguments any) (toolArguments
 	default:
 		return nil, result.NewError(result.CodeInvalidArgument, "unknown OpenRig tool").
 			WithField("tool").
-			WithSuggestion("use one of: " + joinFields(contractNames))
+			WithSuggestion("use one of: " + joinFields(ContractNames()))
 	}
 }
 

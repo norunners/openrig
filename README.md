@@ -44,3 +44,14 @@ agent-selected tuning knobs. Worktree, turn, and process list operations return
 runtime-bounded snapshots of recent matching resources in deterministic order.
 Exact bounds and sort keys are runtime policy rather than agent-selected knobs
 or wire-compatibility promises.
+
+OpenRig publishes explicit MCP annotations for every available native tool.
+Flat operation-union tools use conservative tool-wide hints: if any operation
+can mutate or destroy state, the whole tool is annotated accordingly. Shell and
+process are open-world because their commands may interact with external
+systems.
+
+The common catalog intentionally omits full output schemas. Its names,
+descriptions, input schemas, and annotations are kept under a hard serialized
+budget so every request does not repeatedly spend agent context on large
+response schemas. Structured output DTOs and wire shapes remain tested in Go.

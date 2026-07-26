@@ -36,24 +36,16 @@ const (
 	FreestyleScope
 )
 
-var contractNames = []string{
-	HelpToolName,
-	StatusToolName,
-	WorktreeToolName,
-	TurnToolName,
-	DiffToolName,
-	ShellToolName,
-	ApplyPatchToolName,
-	ProcessToolName,
-	SkillActivateToolName,
-}
-
 // ContractNames returns the complete OpenRig-owned native tool surface.
 //
 // Availability and registration are separate runtime concerns. For example,
 // skill_activate is registered only when skill activation is available.
 func ContractNames() []string {
-	return append([]string(nil), contractNames...)
+	names := make([]string, 0, len(nativeCatalog))
+	for _, entry := range nativeCatalog {
+		names = append(names, entry.name)
+	}
+	return names
 }
 
 // Contracts returns fresh MCP definitions for the complete native surface.
@@ -62,8 +54,9 @@ func Contracts(scope Scope) ([]mcp.Tool, error) {
 	if err := validateScope(scope); err != nil {
 		return nil, err
 	}
-	contracts := make([]mcp.Tool, 0, len(contractNames))
-	for _, name := range contractNames {
+	names := ContractNames()
+	contracts := make([]mcp.Tool, 0, len(names))
+	for _, name := range names {
 		contract, err := Contract(name, scope)
 		if err != nil {
 			return nil, err
@@ -79,30 +72,39 @@ func Contract(name string, scope Scope) (*mcp.Tool, error) {
 	if err := validateScope(scope); err != nil {
 		return nil, err
 	}
+	var (
+		contract *mcp.Tool
+		err      error
+	)
 	switch name {
 	case HelpToolName:
-		return helpContract(), nil
+		contract = helpContract()
 	case StatusToolName:
-		return statusContract(), nil
+		contract = statusContract()
 	case WorktreeToolName:
-		return worktreeContract(), nil
+		contract = worktreeContract()
 	case TurnToolName:
-		return turnContract(), nil
+		contract = turnContract()
 	case DiffToolName:
-		return diffContract(), nil
+		contract = diffContract()
 	case ShellToolName:
-		return shellContract(scope)
+		contract, err = shellContract(scope)
 	case ApplyPatchToolName:
-		return applyPatchContract(scope)
+		contract, err = applyPatchContract(scope)
 	case ProcessToolName:
-		return processContract(scope)
+		contract, err = processContract(scope)
 	case SkillActivateToolName:
-		return skillActivateContract(scope)
+		contract, err = skillActivateContract(scope)
 	default:
 		return nil, result.NewError(result.CodeInvalidArgument, "unknown OpenRig tool").
 			WithField("tool").
-			WithSuggestion("use one of: " + joinFields(contractNames))
+			WithSuggestion("use one of: " + joinFields(ContractNames()))
 	}
+	if err != nil {
+		return nil, err
+	}
+	applyCatalogAnnotations(contract)
+	return contract, nil
 }
 
 func helpContract() *mcp.Tool {
