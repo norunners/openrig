@@ -1,0 +1,14 @@
+{
+  "summary": "In freestyle scope, each work call targets a repository directly; no turn_id is created.",
+  "common_flow": [
+    "Call an available executable work tool with repo set to the configured name, alias, or allowed path."
+  ],
+  "topic": "freestyle",
+  "details": [
+    "Freestyle scopes each work call directly to a repository.",
+    "Pass repo to each work tool; turn_id and worktree lifecycle operations are unavailable."
+  ],
+  "examples": [
+    "{\"tool\":\"shell\",\"arguments\":{\"repo\":\"openrig\",\"command\":\"go test ./...\"}}"
+  ]
+}

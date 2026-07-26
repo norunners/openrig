@@ -1,0 +1,20 @@
+{
+  "summary": "Begin a turn with a repository and goal, work with its turn_id, inspect the diff, then end the turn.",
+  "common_flow": [
+    "turn begin(repo, goal)",
+    "work tools with turn_id",
+    "diff(turn_id)",
+    "turn end(turn_id, outcome)"
+  ],
+  "topic": "advanced",
+  "details": [
+    "Use worktree directly only for explicit reuse, inspection, recovery, or cleanup.",
+    "Use process for supervised long-running commands; process_id is the sole identity of a supervised process.",
+    "skill_activate loads known local skill guidance as text; it does not execute repository work."
+  ],
+  "examples": [
+    "{\"tool\":\"worktree\",\"arguments\":{\"op\":\"open\",\"repo\":\"openrig\",\"base\":\"HEAD\"}}",
+    "{\"tool\":\"process\",\"arguments\":{\"turn_id\":\"turn_...\",\"op\":\"start\",\"command\":\"go test ./...\"}}",
+    "{\"tool\":\"process\",\"arguments\":{\"turn_id\":\"turn_...\",\"op\":\"read\",\"process_id\":\"proc_...\"}}"
+  ]
+}

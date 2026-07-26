@@ -91,20 +91,31 @@ const (
 	ProcessStateFilterKilled     ProcessStateFilter = "killed"
 	ProcessStateFilterRestarting ProcessStateFilter = "restarting"
 	ProcessStateFilterAny        ProcessStateFilter = "any"
+
+	helpTopicCommon    = "common"
+	helpTopicAdvanced  = "advanced"
+	helpTopicFreestyle = "freestyle"
+	helpTopicWorktree  = "worktree"
+	helpTopicTurn      = "turn"
+	helpTopicDiff      = "diff"
+	helpTopicStatus    = "status"
+	helpTopicIDs       = "ids"
+	helpTopicErrors    = "errors"
+	helpTopicSchemas   = "schemas"
 )
 
 var (
 	helpTopics = []string{
-		"common",
-		"advanced",
-		"freestyle",
-		"worktree",
-		"turn",
-		"diff",
-		"status",
-		"ids",
-		"errors",
-		"schemas",
+		helpTopicCommon,
+		helpTopicAdvanced,
+		helpTopicFreestyle,
+		helpTopicWorktree,
+		helpTopicTurn,
+		helpTopicDiff,
+		helpTopicStatus,
+		helpTopicIDs,
+		helpTopicErrors,
+		helpTopicSchemas,
 	}
 	worktreeOps = []WorktreeOp{
 		WorktreeOpOpen,

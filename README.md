@@ -6,6 +6,8 @@ OpenRig is an agentless coding harness exposed through MCP.
 
 Call `help` when the lifecycle is unfamiliar. Routine work starts directly with
 `turn op=begin`; use `status` only to recover context or diagnose runtime state.
+`help` explains workflows supported by the effective catalog without repeating
+the tool definitions already returned by MCP `tools/list`.
 
 Common flow:
 

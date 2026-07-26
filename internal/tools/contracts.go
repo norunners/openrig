@@ -113,7 +113,7 @@ func helpContract() *mcp.Tool {
 		"Explain OpenRig's common, advanced, recovery, and freestyle workflows.",
 		mcp.WithString("topic",
 			mcp.Description("Optional guidance topic."),
-			mcp.Enum("common", "advanced", "freestyle", "worktree", "turn", "diff", "status", "ids", "errors", "schemas"),
+			mcp.Enum(helpTopics...),
 		),
 	)
 }

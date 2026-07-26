@@ -1,0 +1,15 @@
+{
+  "summary": "Begin a turn with a repository and goal, work with its turn_id, inspect the diff, then end the turn.",
+  "common_flow": [
+    "turn begin(repo, goal)",
+    "work tools with turn_id",
+    "diff(turn_id)",
+    "turn end(turn_id, outcome)"
+  ],
+  "examples": [
+    "{\"tool\":\"turn\",\"arguments\":{\"op\":\"begin\",\"repo\":\"openrig\",\"goal\":\"Fix the parser\"}}",
+    "{\"tool\":\"shell\",\"arguments\":{\"turn_id\":\"turn_...\",\"command\":\"go test ./...\"}}",
+    "{\"tool\":\"diff\",\"arguments\":{\"turn_id\":\"turn_...\"}}",
+    "{\"tool\":\"turn\",\"arguments\":{\"op\":\"end\",\"turn_id\":\"turn_...\",\"outcome\":\"completed\",\"summary\":\"Implemented and verified.\"}}"
+  ]
+}
