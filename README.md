@@ -48,6 +48,13 @@ transports. Resolved workspaces and contained paths are canonicalized through
 physical symlinks. Existing symlinks cannot be used to escape the scoped
 workspace, including when the final target does not exist yet.
 
+Each tool call receives immutable invocation metadata with fields for its
+resolved workspace and lifecycle identity when applicable, plus tool-call and
+trace correlation, transport, and MCP session ID. A transport session is
+correlation only: it is not authentication, workspace ownership, or a
+substitute for `turn_id`. Resource access compares the canonical workspace and
+lifecycle IDs exactly.
+
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return
 runtime-bounded snapshots of recent matching resources in deterministic order.
