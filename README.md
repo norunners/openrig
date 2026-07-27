@@ -41,6 +41,13 @@ Public naming is intentional:
 - `workdir` is an optional path relative to the scoped workspace root.
 - `cwd` appears only in responses that report a resolved absolute directory.
 
+OpenRig resolves each `repo` once before domain work. Configured names and
+aliases take precedence over path interpretation; absolute paths are accepted,
+while relative paths are transport policy and are disabled for remote-capable
+transports. Resolved workspaces and contained paths are canonicalized through
+physical symlinks. Existing symlinks cannot be used to escape the scoped
+workspace, including when the final target does not exist yet.
+
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return
 runtime-bounded snapshots of recent matching resources in deterministic order.
