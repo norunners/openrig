@@ -64,6 +64,20 @@ printable-ASCII scalar text or numbers. Invalid tool-call metadata is ignored
 and replaced with an OpenRig `tool_` ULID. `traceparent` contributes a trace ID
 only when it has a valid nonzero W3C trace context shape.
 
+Durable local state uses a Unix-only filesystem backend rooted beneath one
+canonical physical directory. Versioned JSON records are published atomically
+from same-directory temporary files, with restrictive Unix permissions and
+component-by-component directory durability. Each newly created directory and
+the parent containing its entry are synced before record publication. Failures
+after publication are reported separately so callers do not retry a mutation
+that may already be committed. State paths reject lexical and symlink escapes;
+file operations also reject final-component symlinks and directories so one
+record cannot alias or remove another. Non-Unix platforms fail state-root
+initialization with `UNSUPPORTED_PLATFORM`; a cross-platform backend requires
+separate atomic-replacement, access-control, and durability semantics.
+Concrete lifecycle packages retain ownership of their record schemas, recovery
+phases, retention policy, and corrupt-resource handling.
+
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return
 runtime-bounded snapshots of recent matching resources in deterministic order.
