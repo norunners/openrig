@@ -6,6 +6,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/jsonschema-go v0.4.2
 	github.com/mark3labs/mcp-go v0.55.1
+	github.com/oklog/ulid/v2 v2.1.1
 )
 
 require (
