@@ -55,6 +55,15 @@ correlation only: it is not authentication, workspace ownership, or a
 substitute for `turn_id`. Resource access compares the canonical workspace and
 lifecycle IDs exactly.
 
+Revision comparisons in the current contract also require exact owners;
+cross-turn comparison requires a future explicit comparison scope rather than
+discarding lifecycle identity.
+
+Optional client correlation metadata is accepted only as bounded
+printable-ASCII scalar text or numbers. Invalid tool-call metadata is ignored
+and replaced with an OpenRig `tool_` ULID. `traceparent` contributes a trace ID
+only when it has a valid nonzero W3C trace context shape.
+
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return
 runtime-bounded snapshots of recent matching resources in deterministic order.
