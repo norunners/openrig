@@ -140,7 +140,7 @@ func TestContractsDefineExactInputFields(t *testing.T) {
 	}
 }
 
-func TestContractsDeferOutputSchemaPublication(t *testing.T) {
+func TestContractsOmitOutputSchemas(t *testing.T) {
 	contracts, err := Contracts(TurnScope)
 	if err != nil {
 		t.Fatalf("Contracts returned error: %v", err)
@@ -156,37 +156,9 @@ func TestContractsDeferOutputSchemaPublication(t *testing.T) {
 				t.Fatalf("unmarshal contract: %v", err)
 			}
 			if _, ok := document["outputSchema"]; ok {
-				t.Error("outputSchema is published before catalog and token-cost review")
+				t.Error("outputSchema is published in the bounded common catalog")
 			}
 		})
-	}
-}
-
-func TestContractsDeferAnnotationPublication(t *testing.T) {
-	for _, scope := range []Scope{TurnScope, FreestyleScope} {
-		contracts, err := Contracts(scope)
-		if err != nil {
-			t.Fatalf("Contracts returned error: %v", err)
-		}
-		for _, contract := range contracts {
-			t.Run(contract.Name+"/"+scopeName(scope), func(t *testing.T) {
-				encoded, err := json.Marshal(contract)
-				if err != nil {
-					t.Fatalf("marshal contract: %v", err)
-				}
-				var document struct {
-					Annotations map[string]any `json:"annotations"`
-				}
-				if err := json.Unmarshal(encoded, &document); err != nil {
-					t.Fatalf("unmarshal contract: %v", err)
-				}
-				expected := map[string]any{}
-				actual := document.Annotations
-				if diff := cmp.Diff(expected, actual); diff != "" {
-					t.Errorf("mismatch deferred annotations (-expected, +actual):\n%s", diff)
-				}
-			})
-		}
 	}
 }
 
@@ -391,9 +363,9 @@ func TestContractsPublishOnlyToolWideDefaults(t *testing.T) {
 
 func TestInputContractsStayWithinProtocolBudgets(t *testing.T) {
 	// These budgets cover only names, descriptions, and input schemas. They
-	// prevent growth in the model-visible input vocabulary without deciding the
-	// annotation or output-schema strategy ahead of those reviews. Any metadata
-	// added later needs its own explicit, evidence-based budget.
+	// prevent growth in the model-visible input vocabulary independently from
+	// the full effective-catalog budget. Output schemas are intentionally
+	// omitted; reviewed annotations are covered by catalog tests.
 	const (
 		maxInputCatalogBytes     = 8 * 1024
 		maxInputContractBytes    = 2 * 1024

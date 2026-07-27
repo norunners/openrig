@@ -1,0 +1,211 @@
+{
+  "tools": [
+    {
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Explain OpenRig's common, advanced, recovery, and freestyle workflows.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "description": "Optional guidance topic.",
+            "enum": [
+              "common",
+              "advanced",
+              "freestyle",
+              "worktree",
+              "turn",
+              "diff",
+              "status",
+              "ids",
+              "errors",
+              "schemas"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "help"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "description": "Run one bounded shell command in the scoped repository.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "description": "Shell script to run in the configured shell.",
+            "type": "string"
+          },
+          "repo": {
+            "description": "Configured repository name, alias, or allowed path.",
+            "type": "string"
+          },
+          "workdir": {
+            "description": "Optional working directory relative to the scoped workspace root. Defaults to that root.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "repo",
+          "command"
+        ],
+        "type": "object"
+      },
+      "name": "shell"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "description": "Apply a structured patch in the scoped repository.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "patch": {
+            "description": "Complete patch text in the supported patch grammar.",
+            "type": "string"
+          },
+          "repo": {
+            "description": "Configured repository name, alias, or allowed path.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "repo",
+          "patch"
+        ],
+        "type": "object"
+      },
+      "name": "apply_patch"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "description": "Manage supervised processes. Status returns a runtime-bounded snapshot of recent matches in deterministic order.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "description": "Shell command required by start.",
+            "type": "string"
+          },
+          "cursor": {
+            "description": "Optional read cursor returned by a previous read.",
+            "type": "string"
+          },
+          "env": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Optional environment variables for start.",
+            "properties": {},
+            "type": "object"
+          },
+          "op": {
+            "description": "Operation to perform.",
+            "enum": [
+              "start",
+              "status",
+              "read",
+              "stop",
+              "restart",
+              "kill"
+            ],
+            "type": "string"
+          },
+          "process_id": {
+            "description": "Process ID required by read, stop, restart, and kill or used as an exact status selector.",
+            "type": "string"
+          },
+          "repo": {
+            "description": "Configured repository name, alias, or allowed path.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Optional status filter.",
+            "enum": [
+              "running",
+              "exited",
+              "stopped",
+              "killed",
+              "restarting",
+              "any"
+            ],
+            "type": "string"
+          },
+          "workdir": {
+            "description": "Optional start working directory relative to the scoped workspace root. Defaults to that root.",
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "repo",
+          "op"
+        ],
+        "type": "object"
+      },
+      "name": "process"
+    },
+    {
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Load instructions for one local agent skill. Scripts and references are returned as text and never executed.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "include_references": {
+            "default": false,
+            "description": "Include bounded reference file contents.",
+            "type": "boolean"
+          },
+          "include_scripts": {
+            "default": false,
+            "description": "Include bounded script file contents.",
+            "type": "boolean"
+          },
+          "repo": {
+            "description": "Configured repository name, alias, or allowed path.",
+            "type": "string"
+          },
+          "skill": {
+            "description": "Skill directory name.",
+            "maxLength": 64,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "repo",
+          "skill"
+        ],
+        "type": "object"
+      },
+      "name": "skill_activate"
+    }
+  ]
+}
