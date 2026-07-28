@@ -22,7 +22,7 @@ type Root struct {
 	dir  *os.Root
 }
 
-// Open opens an existing state root.
+// Open opens the state root, creating it durably when it does not exist.
 func Open(value string) (*Root, error) {
 	if !supportedPlatform {
 		return nil, stateError(
@@ -38,22 +38,9 @@ func Open(value string) (*Root, error) {
 		return nil, stateError(CodeIO, value, "resolve state root", err)
 	}
 
-	info, err := os.Stat(path)
+	dir, err := openStateRoot(path, defaultDirMode, syncDirectory)
 	if err != nil {
-		return nil, stateError(CodeIO, path, "inspect state root", err)
-	}
-	if !info.IsDir() {
-		return nil, stateError(
-			CodeInvalid,
-			path,
-			"state root must be a directory",
-			nil,
-		)
-	}
-
-	dir, err := os.OpenRoot(path)
-	if err != nil {
-		return nil, stateError(CodeIO, path, "open state root", err)
+		return nil, err
 	}
 	return &Root{
 		path: path,

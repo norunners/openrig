@@ -94,11 +94,6 @@ func TestOpenValidatesExistingStateRoot(t *testing.T) {
 		expectedCode state.ErrorCode
 	}{
 		{
-			name:         "missing path",
-			path:         filepath.Join(parent, "missing"),
-			expectedCode: state.CodeIO,
-		},
-		{
 			name: "existing directory",
 			path: directory,
 		},
@@ -165,16 +160,18 @@ func TestCloseAcceptsNilRoot(t *testing.T) {
 }
 
 func TestStateErrorPreservesDetailsAndCause(t *testing.T) {
-	missing := filepath.Join(t.TempDir(), "missing")
-	_, err := state.Open(missing)
-	if err == nil {
-		t.Fatal("Open error = nil, expected error")
+	cause := errors.New("underlying failure")
+	err := &state.Error{
+		Code:    state.CodeIO,
+		Path:    "/state",
+		Message: "open state root",
+		Err:     cause,
 	}
-	if !errors.Is(err, os.ErrNotExist) {
-		t.Errorf("Open error does not preserve os.ErrNotExist: %v", err)
+	if !errors.Is(err, cause) {
+		t.Errorf("state error does not preserve its cause: %v", err)
 	}
 	if err.Error() == "" {
-		t.Error("Open error text is empty")
+		t.Error("state error text is empty")
 	}
 }
 

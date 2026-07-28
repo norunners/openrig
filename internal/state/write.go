@@ -3,6 +3,7 @@ package state
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -13,9 +14,10 @@ const defaultFileMode = 0o600
 // FileOptions controls atomic file publication.
 type FileOptions struct {
 	FileMode os.FileMode
+	DirMode  os.FileMode
 }
 
-// WriteFile publishes data atomically within an existing state directory.
+// WriteFile publishes data atomically beneath the opened state root.
 func (r *Root) WriteFile(name string, data []byte, opts FileOptions) error {
 	name, path, err := r.resourceName(name)
 	if err != nil {
@@ -38,24 +40,28 @@ func (r *Root) writeFileAtomicWithSync(
 	path string,
 	data []byte,
 	opts FileOptions,
-	syncParent func(*os.Root, string) error,
+	syncDir func(*os.Root, string) error,
 ) error {
 	opts = opts.withDefaults()
 	if err := requireDurableMutations(path); err != nil {
 		return err
 	}
+	if err := ensureParentDirectories(
+		r.dir,
+		name,
+		opts.DirMode,
+		syncDir,
+	); err != nil {
+		code := CodeIO
+		if errors.Is(err, errPathComponentNotDirectory) {
+			code = CodeInvalid
+		}
+		return stateError(code, path, "create parent directory", err)
+	}
 
 	parent := filepath.Dir(name)
 	parentRoot, err := r.dir.OpenRoot(parent)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return stateError(
-				CodeIO,
-				path,
-				"parent directory does not exist",
-				err,
-			)
-		}
 		return stateError(CodeInvalid, path, "open parent directory", err)
 	}
 	defer parentRoot.Close()
@@ -67,12 +73,7 @@ func (r *Root) writeFileAtomicWithSync(
 
 	tmp, tmpName, err := createTemporaryFile(parentRoot, opts.FileMode)
 	if err != nil {
-		return stateError(
-			CodeIO,
-			path,
-			"create temporary file",
-			err,
-		)
+		return stateError(CodeIO, path, "create temporary file", err)
 	}
 	published := false
 	defer func() {
@@ -105,7 +106,7 @@ func (r *Root) writeFileAtomicWithSync(
 		return stateError(CodeIO, path, "replace file", err)
 	}
 	published = true
-	if err := syncParent(parentRoot, "."); err != nil {
+	if err := syncDir(parentRoot, "."); err != nil {
 		return stateError(
 			CodeDurability,
 			path,
@@ -158,6 +159,9 @@ func createTemporaryFile(root *os.Root, mode os.FileMode) (*os.File, string, err
 func (opts FileOptions) withDefaults() FileOptions {
 	if opts.FileMode == 0 {
 		opts.FileMode = defaultFileMode
+	}
+	if opts.DirMode == 0 {
+		opts.DirMode = defaultDirMode
 	}
 	return opts
 }

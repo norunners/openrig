@@ -25,6 +25,7 @@ type JSONOptions struct {
 	Kind          string
 	SchemaVersion int
 	FileMode      os.FileMode
+	DirMode       os.FileMode
 }
 
 func (opts JSONOptions) withReadDefaults() JSONOptions {
@@ -39,6 +40,9 @@ func (opts JSONOptions) withWriteDefaults() JSONOptions {
 	opts = opts.withReadDefaults()
 	if opts.FileMode == 0 {
 		opts.FileMode = defaultFileMode
+	}
+	if opts.DirMode == 0 {
+		opts.DirMode = defaultDirMode
 	}
 	return opts
 }

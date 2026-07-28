@@ -58,21 +58,6 @@ func TestWriteFileUsesRestrictivePermissions(t *testing.T) {
 	}
 }
 
-func TestWriteFileRequiresExistingParentDirectory(t *testing.T) {
-	root := openInternalRoot(t, t.TempDir())
-	err := root.WriteFile(
-		filepath.Join("worktrees", "wt_01", "state.json"),
-		[]byte("state"),
-		FileOptions{},
-	)
-	if diff := cmp.Diff(CodeIO, CodeOf(err)); diff != "" {
-		t.Errorf("mismatch error code (-expected, +actual):\n%s", diff)
-	}
-	if _, statErr := os.Stat(filepath.Join(root.Path(), "worktrees")); !os.IsNotExist(statErr) {
-		t.Errorf("parent directory stat error = %v, expected not exist", statErr)
-	}
-}
-
 func TestWriteFileClassifiesParentSyncFailureAsDurability(t *testing.T) {
 	root := openInternalRoot(t, t.TempDir())
 	syncFailure := errors.New("sync failed")
@@ -100,7 +85,6 @@ func TestWriteFileClassifiesParentSyncFailureAsDurability(t *testing.T) {
 		t.Errorf("mismatch published record (-expected, +actual):\n%s", diff)
 	}
 }
-
 func TestWriteFileRejectsFinalSymlinkAlias(t *testing.T) {
 	root := openInternalRoot(t, t.TempDir())
 	target := filepath.Join(root.Path(), "runtime.json")
