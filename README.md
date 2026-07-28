@@ -88,13 +88,18 @@ failures. Callers ignore partially decoded destinations when a read fails.
 
 On macOS and Linux, writes publish records within the same 16 MiB limit from an
 exclusive same-directory temporary file through the root handle, then sync,
-close, rename, and sync the parent directory. Windows state roots and reads are
-supported, but durable mutations fail before publication with
-`UNSUPPORTED_PLATFORM` until Windows atomic replacement and directory
-durability have a separately verified contract. A parent directory must already
-exist. Post-publication sync failures are reported as `DURABILITY_UNCERTAIN`, so
-callers do not retry a mutation that may already be committed. Directory-tree
-creation and removal semantics are reviewed separately.
+close, rename, and sync the parent directory. Missing roots and nested resource
+directories are created one component at a time; each new directory and its
+containing parent are synced before publication proceeds. Removal rejects
+aliases and non-regular entries, unlinks through the opened parent handle, and
+syncs that directory.
+
+Windows existing roots and reads are supported, but durable creation, writing,
+and removal fail before mutation with `UNSUPPORTED_PLATFORM` until Windows
+atomic replacement and directory durability have a separately verified
+contract. Post-publication or post-removal sync failures are reported as
+`DURABILITY_UNCERTAIN`, so callers do not retry a mutation that may already be
+committed.
 
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return

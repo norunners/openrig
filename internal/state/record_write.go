@@ -2,7 +2,7 @@ package state
 
 import "encoding/json"
 
-// WriteJSON publishes a versioned JSON object atomically within an existing directory.
+// WriteJSON publishes a versioned JSON object atomically beneath the state root.
 func (r *Root) WriteJSON(name string, value any, opts JSONOptions) error {
 	name, path, err := r.resourceName(name)
 	if err != nil {
@@ -24,7 +24,10 @@ func (r *Root) WriteJSON(name string, value any, opts JSONOptions) error {
 		name,
 		path,
 		data,
-		FileOptions{FileMode: opts.FileMode},
+		FileOptions{
+			FileMode: opts.FileMode,
+			DirMode:  opts.DirMode,
+		},
 	)
 }
 
