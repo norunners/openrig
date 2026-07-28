@@ -85,7 +85,16 @@ that was selected under the rooted name without requiring it to remain the
 current directory entry until the read completes. Invalid destinations are
 caller errors; malformed headers or bodies remain explicit corrupt-record
 failures. Callers ignore partially decoded destinations when a read fails.
-Record publication and mutation semantics are reviewed separately.
+
+On macOS and Linux, writes publish records within the same 16 MiB limit from an
+exclusive same-directory temporary file through the root handle, then sync,
+close, rename, and sync the parent directory. Windows state roots and reads are
+supported, but durable mutations fail before publication with
+`UNSUPPORTED_PLATFORM` until Windows atomic replacement and directory
+durability have a separately verified contract. A parent directory must already
+exist. Post-publication sync failures are reported as `DURABILITY_UNCERTAIN`, so
+callers do not retry a mutation that may already be committed. Directory-tree
+creation and removal semantics are reviewed separately.
 
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return

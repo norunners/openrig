@@ -9,13 +9,19 @@ import (
 type ErrorCode string
 
 const (
-	CodeInvalid             ErrorCode = "INVALID"
-	CodeNotFound            ErrorCode = "NOT_FOUND"
-	CodeMalformed           ErrorCode = "MALFORMED"
-	CodeUnsupportedVersion  ErrorCode = "UNSUPPORTED_VERSION"
-	CodeKindMismatch        ErrorCode = "KIND_MISMATCH"
-	CodeIO                  ErrorCode = "IO"
+	CodeInvalid            ErrorCode = "INVALID"
+	CodeNotFound           ErrorCode = "NOT_FOUND"
+	CodeMalformed          ErrorCode = "MALFORMED"
+	CodeUnsupportedVersion ErrorCode = "UNSUPPORTED_VERSION"
+	CodeKindMismatch       ErrorCode = "KIND_MISMATCH"
+	CodeIO                 ErrorCode = "IO"
+
+	// CodeUnsupportedPlatform means the requested state operation is
+	// unavailable on the current operating system.
 	CodeUnsupportedPlatform ErrorCode = "UNSUPPORTED_PLATFORM"
+	// CodeDurability means a mutation was published, but its directory entry
+	// could not be synced. Callers must treat the resulting state as committed.
+	CodeDurability ErrorCode = "DURABILITY_UNCERTAIN"
 )
 
 // Error is returned by state primitives with a stable category.

@@ -1,6 +1,7 @@
 package state
 
 import (
+	"os"
 	"reflect"
 	"strings"
 )
@@ -23,12 +24,21 @@ type RecordHeader struct {
 type JSONOptions struct {
 	Kind          string
 	SchemaVersion int
+	FileMode      os.FileMode
 }
 
 func (opts JSONOptions) withReadDefaults() JSONOptions {
 	opts.Kind = strings.TrimSpace(opts.Kind)
 	if opts.SchemaVersion == 0 {
 		opts.SchemaVersion = SchemaVersion
+	}
+	return opts
+}
+
+func (opts JSONOptions) withWriteDefaults() JSONOptions {
+	opts = opts.withReadDefaults()
+	if opts.FileMode == 0 {
+		opts.FileMode = defaultFileMode
 	}
 	return opts
 }
