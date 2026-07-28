@@ -64,6 +64,14 @@ printable-ASCII scalar text or numbers. Invalid tool-call metadata is ignored
 and replaced with an OpenRig `tool_` ULID. `traceparent` contributes a trace ID
 only when it has a valid nonzero W3C trace context shape.
 
+Durable local state uses a Unix-only filesystem backend rooted beneath one
+canonical physical directory. State paths reject lexical and symlink escapes
+while allowing missing descendants and contained intermediate symlinks.
+Existing roots must resolve to directories; missing roots are accepted for
+later lazy creation. Non-Unix platforms fail state-root initialization with
+`UNSUPPORTED_PLATFORM` rather than claiming unproven filesystem guarantees.
+Record I/O and mutation semantics are reviewed separately.
+
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return
 runtime-bounded snapshots of recent matching resources in deterministic order.
