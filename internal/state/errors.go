@@ -9,8 +9,13 @@ import (
 type ErrorCode string
 
 const (
-	CodeInvalid ErrorCode = "INVALID"
-	CodeIO      ErrorCode = "IO"
+	CodeInvalid             ErrorCode = "INVALID"
+	CodeNotFound            ErrorCode = "NOT_FOUND"
+	CodeMalformed           ErrorCode = "MALFORMED"
+	CodeUnsupportedVersion  ErrorCode = "UNSUPPORTED_VERSION"
+	CodeKindMismatch        ErrorCode = "KIND_MISMATCH"
+	CodeIO                  ErrorCode = "IO"
+	CodeUnsupportedPlatform ErrorCode = "UNSUPPORTED_PLATFORM"
 )
 
 // Error is returned by state primitives with a stable category.

@@ -1,9 +1,16 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
+)
+
+var errUnsupportedPlatform = errors.New(
+	"state storage requires macOS, Linux, or Windows",
 )
 
 // Root is the filesystem authority for one OpenRig state tree.
@@ -17,6 +24,15 @@ type Root struct {
 
 // Open opens an existing state root.
 func Open(value string) (*Root, error) {
+	if !supportedPlatform {
+		return nil, stateError(
+			CodeUnsupportedPlatform,
+			value,
+			"state storage is unsupported on "+runtime.GOOS,
+			errUnsupportedPlatform,
+		)
+	}
+
 	path, err := statePath(value)
 	if err != nil {
 		return nil, stateError(CodeIO, value, "resolve state root", err)
@@ -64,6 +80,45 @@ func (r *Root) Close() error {
 		return stateError(CodeIO, r.path, "close state root", err)
 	}
 	return nil
+}
+
+func (r *Root) resourceName(name string) (string, string, error) {
+	if r == nil || r.dir == nil {
+		return "", name, stateError(
+			CodeInvalid,
+			name,
+			"state root is not initialized",
+			nil,
+		)
+	}
+	if strings.IndexByte(name, 0) >= 0 {
+		return "", r.diagnosticPath(name), stateError(
+			CodeInvalid,
+			r.diagnosticPath(name),
+			"state resource name contains a NUL byte",
+			nil,
+		)
+	}
+	if name == "" || !filepath.IsLocal(name) || filepath.Clean(name) == "." {
+		return "", r.diagnosticPath(name), stateError(
+			CodeInvalid,
+			r.diagnosticPath(name),
+			"state resource name must be relative to the state root",
+			nil,
+		)
+	}
+	name = filepath.Clean(name)
+	return name, r.diagnosticPath(name), nil
+}
+
+func (r *Root) diagnosticPath(name string) string {
+	if r == nil || r.path == "" {
+		return name
+	}
+	if name == "" {
+		return r.path
+	}
+	return filepath.Join(r.path, name)
 }
 
 func defaultRoot() (string, error) {

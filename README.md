@@ -64,14 +64,28 @@ printable-ASCII scalar text or numbers. Invalid tool-call metadata is ignored
 and replaced with an OpenRig `tool_` ULID. `traceparent` contributes a trace ID
 only when it has a valid nonzero W3C trace context shape.
 
-Durable local state opens an existing directory through `os.Root`. The open
-directory handle is the filesystem authority; its absolute path is retained
-only for diagnostics. State operations use relative resource names through that
-handle so traversal and escaping symlinks are rejected at operation time, and
-the authority remains attached to the original directory if its path is
-renamed or replaced. Explicit filesystem paths are preserved exactly, including
-legal leading or trailing spaces.
-Record I/O and mutation semantics are reviewed separately.
+Durable local state explicitly supports macOS, Linux, and Windows and requires
+Go 1.26.5 or later. Other operating systems fail at `state.Open` rather than
+silently weakening the filesystem contract. An existing state directory is
+opened through `os.Root`; that handle is the filesystem authority, while its
+absolute path is retained only for diagnostics. State operations use relative
+resource names through the handle so traversal and escaping symlinks are
+rejected at operation time, and the authority remains attached to the original
+directory if its path is renamed or replaced.
+
+Explicit filesystem paths and legal leading or trailing resource-name spaces
+are preserved; other resource-name aliases are normalized with
+`filepath.Clean`. Versioned JSON reads reject final-component aliases,
+directories, special files, records larger than 16 MiB, and invalid UTF-8.
+Candidate opens are nonblocking on macOS and Linux so a FIFO replacement cannot
+hang the runtime. A stable final alias is rejected before open, and the opened
+descriptor must itself be regular; Windows additionally verifies entry identity
+with `os.SameFile`. A successful read returns one complete descriptor snapshot
+that was selected under the rooted name without requiring it to remain the
+current directory entry until the read completes. Invalid destinations are
+caller errors; malformed headers or bodies remain explicit corrupt-record
+failures. Callers ignore partially decoded destinations when a read fails.
+Record publication and mutation semantics are reviewed separately.
 
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return
