@@ -64,6 +64,15 @@ printable-ASCII scalar text or numbers. Invalid tool-call metadata is ignored
 and replaced with an OpenRig `tool_` ULID. `traceparent` contributes a trace ID
 only when it has a valid nonzero W3C trace context shape.
 
+Durable local state opens an existing directory through `os.Root`. The open
+directory handle is the filesystem authority; its absolute path is retained
+only for diagnostics. State operations use relative resource names through that
+handle so traversal and escaping symlinks are rejected at operation time, and
+the authority remains attached to the original directory if its path is
+renamed or replaced. Explicit filesystem paths are preserved exactly, including
+legal leading or trailing spaces.
+Record I/O and mutation semantics are reviewed separately.
+
 Shell, process, diff, and skill output bounds are runtime policy rather than
 agent-selected tuning knobs. Worktree, turn, and process list operations return
 runtime-bounded snapshots of recent matching resources in deterministic order.
